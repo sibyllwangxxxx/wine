@@ -5,15 +5,19 @@ library(plotly)
 library(ggplot2)
 library(shinyWidgets)
 
+
+# read data ---------------------------------------------------------------
+
 # wine_ratings <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-28/winemag-data-130k-v2.csv")
 # saveRDS(wine_ratings, "wine_ratings.RDS")
 wine_ratings <- readRDS("wine_ratings.RDS")
 
+# tmp file during development, loading all rows too slow
 # saveRDS(wine_ratings[1:1000,], "wine_ratings1000.RDS")
 # wine_ratings <- readRDS("wine_ratings1000.RDS")
 
 
-
+# get values for categorical variables for "option" argument in pickerInput
 options <- function(var){
   var <- enquo(var)
   wine_ratings %>% pull(!!var) %>% unique()
@@ -26,6 +30,11 @@ titles <- options(title)
 varieties <- options(variety)
 wineries <- options(winery)
 prices <- options(price)
+
+
+
+
+# UI ----------------------------------------------------------------------
 
 ui <- dashboardPage(
   
@@ -145,9 +154,9 @@ ui <- dashboardPage(
               
               fluidRow(
                 box(width = 6,
-                    plotOutput("boxplot1")),
+                    plotOutput("hist1")),
                 box(width = 6,
-                    plotOutput("boxplot2"))
+                    plotOutput("hist2"))
               )
       )
 
@@ -156,12 +165,19 @@ ui <- dashboardPage(
   )
 )
 
+
+
+
+
+# server ------------------------------------------------------------------
+
 server <- function(session, input, output) {
   
+  ## update price range slider with maxprice
+  ## hard to use slider with such long-tail prices
   observeEvent(input$maxprice,{updateSliderInput(session, inputId = "pricerange", label = "Price range", max = input$maxprice)})
   
-  output$titleUI <- renderUI(titlePanel(input$title))
-  
+  ## filtered data
   dat <- eventReactive(input$plot, {
            wine_ratings %>%
                 filter(price <= input$maxprice,
@@ -173,8 +189,10 @@ server <- function(session, input, output) {
                        winery %in% input$winery)
   })
   
+  ## adj r squared for all data < maxprice in left plot
   rsq_all <- summary(lm(points ~ price, data = wine_ratings))$adj.r.squared
   
+  ## left plot
   p1 <- eventReactive(input$plot, {
            ggplot(data = filter(wine_ratings, price <= input$maxprice), aes(x = price, y = points)) +
                geom_point() +
@@ -185,6 +203,7 @@ server <- function(session, input, output) {
                if(input$pricerange[1] != min(prices, na.rm = T) | input$pricerange[2] != input$maxprice) annotate("rect", xmin = input$pricerange[1], xmax = input$pricerange[2], ymin = 75, ymax = 100, alpha = 0.2)
   })
   
+  ## right plot
   p2 <- eventReactive(input$plot, {
     validate(
       need(try(nrow(dat())!=0), paste0("No data available in selected categories."))
@@ -204,7 +223,7 @@ server <- function(session, input, output) {
   output$pricevrating2 <- renderPlot(p2())
   
   
-  
+  ## hover info
   output$hover_info1 <- renderUI({
     hover <- input$plot_hover1
     point <- nearPoints(wine_ratings, hover, threshold = 5, maxpoints = 1, addDist = TRUE)
@@ -241,8 +260,7 @@ server <- function(session, input, output) {
     )
   })
 
-  
-  
+  ## need to write into a function...
   output$hover_info2 <- renderUI({
     hover <- input$plot_hover2
     point <- nearPoints(dat(), hover, threshold = 5, maxpoints = 1, addDist = TRUE)
@@ -279,9 +297,15 @@ server <- function(session, input, output) {
   })
   
   
-  ## ------------------------------------------------------------------------------ ##
+
+# individual wine tab -----------------------------------------------------
+
+  output$titleUI <- renderUI(titlePanel(input$title))
+  
+  ## selected single wine
   selected <- reactive(wine_ratings %>% filter(title == input$title))
   
+  ## all wine in the same variety as the selected single wine
   variety_selected <- reactive(wine_ratings %>% filter(variety == selected()$variety))
   
   output$countryBox <- renderValueBox(valueBox(selected()$country, "Country", icon = icon("list"), color = "purple"))
@@ -293,7 +317,8 @@ server <- function(session, input, output) {
   output$reviewerBox <- renderValueBox(valueBox(selected()$taster_name, "Reviewer", icon = icon("list"), color = "orange"))
   
   
-  output$boxplot1 <- renderPlot({
+  ## histogram of prices and points of wines in the same variety as the selected wine
+  output$hist1 <- renderPlot({
     
     quantile_price <- ecdf(variety_selected()$price)(selected()$price)
     
@@ -306,7 +331,7 @@ server <- function(session, input, output) {
       theme(plot.title=element_text(hjust=0.5))
   })
   
-  output$boxplot2 <- renderPlot({
+  output$hist2 <- renderPlot({
     
     quantile_points <- ecdf(variety_selected()$points)(selected()$points)
     
