@@ -307,6 +307,8 @@ server <- function(session, input, output) {
   ## all wine in the same variety as the selected single wine
   variety_selected <- reactive(wine_ratings %>% filter(variety == selected()$variety))
   
+  
+  ## value boxes
   output$countryBox <- renderValueBox(valueBox(selected()$country, "Country", icon = icon("list"), color = "purple"))
   output$provinceBox <- renderValueBox(valueBox(selected()$province, "Province", icon = icon("list"), color = "aqua"))
   output$regionBox <- renderValueBox(valueBox(selected()$region_1, "Region", icon = icon("list"), color = "green"))
