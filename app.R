@@ -41,7 +41,6 @@ ui <- dashboardPage(
   dashboardHeader(title = "Wine rating explorer"),
   dashboardSidebar(
     sidebarMenu(
-      id="menu", ## https://stackoverflow.com/questions/29925585/conditional-panel-in-shiny-dashboard
       
       menuItem("1 - All wines", tabName = "all"),
       
