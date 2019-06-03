@@ -1,0 +1,13 @@
+name: wine
+title: wine
+username:
+account: sibylisaprophet
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 962011
+bundleId: 2127699
+url: https://sibylisaprophet.shinyapps.io/wine/
+when: 1559588126.16886
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: wine_ratings1000.RDS
