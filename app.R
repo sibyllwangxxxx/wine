@@ -328,7 +328,7 @@ server <- function(session, input, output) {
       theme_light() +
       geom_vline(xintercept = selected()$price, color = "red", size = 2) +
       labs(x = "price", title = "Price of selected wine compared to same variety", 
-           subtitle = paste0("Selected wine is more expensive than ", round(quantile_price*100, 2)), "% of wines in same variety.") +
+           subtitle = paste0("Selected wine is more expensive than ", round(quantile_price*100, 2), "% of wines in same variety.")) +
       theme(plot.title=element_text(hjust=0.5))
   })
   
@@ -341,7 +341,7 @@ server <- function(session, input, output) {
       theme_light() +
       geom_vline(xintercept = selected()$points, color = "green", size = 2) +
       labs(x = "rating", title = "Rating of selected wine compared to same variety", 
-           subtitle = paste0("Selected wine has higher rating than ", round(quantile_points*100, 2)), "% of wines in same variety.") +
+           subtitle = paste0("Selected wine has higher rating than ", round(quantile_points*100, 2), "% of wines in same variety.")) +
       theme(plot.title=element_text(hjust=0.5))
   })
   
