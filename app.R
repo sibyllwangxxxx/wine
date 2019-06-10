@@ -4,17 +4,18 @@ library(shiny)
 library(plotly)
 library(ggplot2)
 library(shinyWidgets)
+library(ggedit)
 
 
 # read data ---------------------------------------------------------------
 
 # wine_ratings <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-28/winemag-data-130k-v2.csv")
 # saveRDS(wine_ratings, "wine_ratings.RDS")
-wine_ratings <- readRDS("wine_ratings.RDS")
+# wine_ratings <- readRDS("wine_ratings1000.RDS")
 
 # tmp file during development, loading all rows too slow
 # saveRDS(wine_ratings[1:1000,], "wine_ratings1000.RDS")
-# wine_ratings <- readRDS("wine_ratings1000.RDS")
+wine_ratings <- readRDS("wine_ratings1000.RDS")
 
 
 # get values for categorical variables for "option" argument in pickerInput
