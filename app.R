@@ -123,8 +123,9 @@ ui <- dashboardPage(
                            ))
                     ),
                 box(width = 6, title = "Wine price and rating plot",
-                    plotOutput("pricevrating1",
-                               click = clickOpts("plot_hover1")),
+                    # plotOutput("pricevrating1",
+                    #            click = clickOpts("plot_hover1")),
+                    ggEditUI("pOut1"),
                     uiOutput("hover_info1")),
                 
                 box(width = 6, title = "Wine price and rating plot (selected range)",
@@ -218,7 +219,9 @@ server <- function(session, input, output) {
               labs(subtitle = paste0("How much variation in rating is explained by price: ", round(rsq_sub, 2)), y = "rating")
   })
 
-  output$pricevrating1 <- renderPlot(p1())
+  #output$pricevrating1 <- renderPlot(p1())
+  callModule(ggEdit,'pOut1',obj=reactive(list(p1=p1())))
+  
   output$pricevrating2 <- renderPlot(p2())
   
   
@@ -299,7 +302,12 @@ server <- function(session, input, output) {
 
 # individual wine tab -----------------------------------------------------
 
-  output$titleUI <- renderUI(titlePanel(input$title))
+  output$titleUI <- renderUI({
+    tagList(
+      titlePanel(input$title),
+      box(width = 12, htmlOutput("description"))
+    )
+    })
   
   ## selected single wine
   selected <- reactive(wine_ratings %>% filter(title == input$title))
@@ -307,6 +315,8 @@ server <- function(session, input, output) {
   ## all wine in the same variety as the selected single wine
   variety_selected <- reactive(wine_ratings %>% filter(variety == selected()$variety))
   
+  ## description
+  output$description <- renderUI(HTML(selected()$description))
   
   ## value boxes
   output$countryBox <- renderValueBox(valueBox(selected()$country, "Country", icon = icon("list"), color = "purple"))

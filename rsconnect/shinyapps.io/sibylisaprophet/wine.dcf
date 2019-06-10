@@ -5,9 +5,9 @@ account: sibylisaprophet
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 962011
-bundleId: 2127699
+bundleId: 2128452
 url: https://sibylisaprophet.shinyapps.io/wine/
-when: 1559588126.16886
+when: 1559612457.69895
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: wine_ratings1000.RDS
